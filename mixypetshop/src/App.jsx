@@ -20,6 +20,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminReservationsPage from './pages/admin/AdminReservationsPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
+import AdminNewsPage from './pages/admin/AdminNewsPage';
+import AdminGroomingPage from './pages/admin/AdminGroomingPage';
 import CreateOrderPage from './pages/admin/CreateOrderPage';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -86,6 +88,8 @@ const App = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="create-order" element={<CreateOrderPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />
+            <Route path="news" element={<AdminNewsPage />} />
+            <Route path="grooming" element={<AdminGroomingPage />} />
             <Route path="products" element={<AdminProductsPage />} />
             <Route path="reservations" element={<AdminReservationsPage />} />
           </Route>

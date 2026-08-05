@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Calendar, CreditCard, Users, Settings, LogOut, Menu, X, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Calendar, CreditCard, Users, Newspaper, LogOut, Scissors, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = () => {
@@ -12,6 +12,8 @@ const AdminLayout = () => {
     { path: '/admin', icon: LayoutDashboard, label: 'Overview' },
     { path: '/admin/create-order', icon: ShoppingCart, label: 'Tambah Order' },
     { path: '/admin/payments', icon: CreditCard, label: 'Konfirmasi Pembayaran' },
+    { path: '/admin/news', icon: Newspaper, label: 'Berita' },
+    { path: '/admin/grooming', icon: Scissors, label: 'Grooming' },
     { path: '/admin/products', icon: Package, label: 'Produk' },
     { path: '/admin/reservations', icon: Calendar, label: 'Reservasi' },
   ];

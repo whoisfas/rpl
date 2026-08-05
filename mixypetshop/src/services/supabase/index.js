@@ -12,3 +12,5 @@ export { paymentService } from './paymentService';
 export { petService } from './petService';
 export { statsService } from './statsService';
 export { storageService } from './storageService';
+export { newsService } from './newsService';
+export { groomingService } from './groomingService';

@@ -1,9 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, PawPrint, Scissors, Home, ShoppingCart, Heart } from 'lucide-react';
+import { ArrowRight, PawPrint, Scissors, Home, ShoppingCart, Heart, Newspaper, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { productService, newsService, groomingService } from '../services/supabase';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const LandingPage = () => {
+  const [premiumProducts, setPremiumProducts] = useState([]);
+  const [news, setNews] = useState([]);
+  const [groomingServices, setGroomingServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [productsData, newsData, groomingData] = await Promise.all([
+        productService.getAllProducts(),
+        newsService.getAllNews(),
+        groomingService.getAllGroomingServices()
+      ]);
+      const premium = productsData?.filter(p => p.is_premium) || [];
+      setPremiumProducts(premium.slice(0, 4));
+      setNews(newsData?.slice(0, 3) || []);
+      setGroomingServices(groomingData?.slice(0, 4) || []);
+    } catch (err) {
+      console.error('Gagal memuat data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -15,7 +48,7 @@ const LandingPage = () => {
           <div className="absolute top-20 left-20 w-72 h-72 bg-primary-500/30 rounded-full blur-3xl animate-pulse-slow"></div>
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent-500/30 rounded-full blur-3xl animate-pulse-slow"></div>
         </div>
-        
+
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <div className="mb-8 animate-float">
             <PawPrint className="w-24 h-24 mx-auto text-primary-400" />
@@ -39,86 +72,120 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 gradient-text">Tentang Mixy Pet Shop</h2>
-            <p className="dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
-              Platform modern untuk manajemen perawatan hewan peliharaan Anda dengan fitur lengkap dan pengalaman pengguna yang premium.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="glass-dark p-8 rounded-2xl card-hover">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-6">
-                <Heart className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 dark:text-white text-gray-900">Perawatan Penuh Kasih</h3>
-              <p className="dark:text-gray-400 text-gray-600">Kami peduli dengan kesehatan dan kebahagiaan hewan peliharaan Anda seperti keluarga sendiri.</p>
-            </div>
-            
-            <div className="glass-dark p-8 rounded-2xl card-hover">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-6">
-                <PawPrint className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 dark:text-white text-gray-900">Tim Ahli</h3>
-              <p className="dark:text-gray-400 text-gray-600">Tim profesional berpengalaman dalam perawatan hewan peliharaan berbagai jenis.</p>
-            </div>
-            
-            <div className="glass-dark p-8 rounded-2xl card-hover">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-6">
-                <ShoppingCart className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 dark:text-white text-gray-900">Produk Berkualitas</h3>
-              <p className="dark:text-gray-400 text-gray-600">Pakan dan produk perawatan berkualitas tinggi untuk kebutuhan hewan peliharaan Anda.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section id="services" className="py-24 px-4 relative">
+      {/* News Section */}
+      <section id="news" className="py-24 px-4 relative">
         <div className="absolute inset-0 gradient-bg opacity-30"></div>
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 gradient-text">Layanan Kami</h2>
-            <p className="dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
-              Layanan lengkap untuk kebutuhan hewan peliharaan Anda
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="glass p-8 rounded-2xl card-hover">
-              <div className="flex items-start space-x-4">
-                <div className="w-14 h-14 bg-primary-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Scissors className="w-7 h-7 text-primary-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2 dark:text-white text-gray-900">Layanan Grooming</h3>
-                  <p className="dark:text-gray-400 text-gray-600 mb-4">Layanan grooming profesional untuk menjaga kebersihan dan kesehatan hewan peliharaan Anda.</p>
-                  <Link to="/register" className="text-primary-400 hover:text-primary-300 transition-colors">
-                    Booking Sekarang <ArrowRight className="inline ml-1 w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
+          <div className="flex items-center justify-between mb-12">
+            <div className="flex items-center space-x-3">
+              <Newspaper className="w-8 h-8 text-primary-400" />
+              <h2 className="text-4xl font-bold gradient-text">Berita Terkini</h2>
             </div>
-            
-            <div className="glass p-8 rounded-2xl card-hover">
-              <div className="flex items-start space-x-4">
-                <div className="w-14 h-14 bg-accent-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Home className="w-7 h-7 text-accent-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2 dark:text-white text-gray-900">Hotel Hewan</h3>
-                  <p className="dark:text-gray-400 text-gray-600 mb-4">Hotel hewan dengan fasilitas lengkap dan perawatan 24 jam saat Anda bepergian.</p>
-                  <Link to="/register" className="text-accent-400 hover:text-accent-300 transition-colors">
-                    Booking Sekarang <ArrowRight className="inline ml-1 w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Link to="/register" className="text-primary-400 hover:text-primary-300 transition-colors flex items-center space-x-2">
+              <span>Lihat Semua Berita</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
+
+          {/* Hero News Carousel */}
+          {loading ? (
+            <div className="h-[500px] bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-3xl animate-pulse"></div>
+          ) : news.length > 0 ? (
+            <div className="relative">
+              <Swiper
+                modules={[Autoplay, Navigation, Pagination]}
+                spaceBetween={30}
+                slidesPerView={1}
+                autoplay={{
+                  delay: 5000,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true
+                }}
+                navigation={{
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev'
+                }}
+                pagination={{
+                  clickable: true,
+                  el: '.swiper-pagination'
+                }}
+                loop={true}
+                className="hero-swiper"
+              >
+                {news.map((item) => (
+                  <SwiperSlide key={item.id}>
+                    <div className="relative h-[500px] md:h-[600px] rounded-3xl overflow-hidden shadow-2xl">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary-500/30 to-accent-500/30 flex items-center justify-center">
+                          <Newspaper className="w-24 h-24 text-primary-400/50" />
+                        </div>
+                      )}
+                      {/* Overlay Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+
+                      {/* Content */}
+                      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+                        <div className="max-w-3xl">
+                          <div className="flex items-center space-x-4 mb-4">
+                            <span className="px-3 py-1 bg-primary-500/80 text-white text-xs font-medium rounded-full">
+                              Berita
+                            </span>
+                            <span className="dark:text-gray-300 text-gray-300 text-sm">
+                              {new Date(item.created_at).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </span>
+                            <span className="dark:text-gray-400 text-gray-400 text-sm">
+                              Admin
+                            </span>
+                          </div>
+
+                          <h3 className="text-2xl md:text-4xl font-bold dark:text-white text-white mb-4 line-clamp-2">
+                            {item.title}
+                          </h3>
+
+                          <p className="dark:text-gray-200 text-gray-200 text-sm md:text-base mb-6 line-clamp-2">
+                            {item.content}
+                          </p>
+
+                          <Link
+                            to="/register"
+                            className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl transition-colors"
+                          >
+                            <span>Baca Selengkapnya</span>
+                            <ArrowRight className="w-5 h-5" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+
+              {/* Navigation Buttons */}
+              <button className="swiper-button-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors">
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+              <button className="swiper-button-next absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors">
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+
+              {/* Pagination */}
+              <div className="swiper-pagination absolute bottom-8 right-8"></div>
+            </div>
+          ) : (
+            <div className="text-center dark:text-gray-400 text-gray-600 py-12">
+              Belum ada berita
+            </div>
+          )}
         </div>
       </section>
 
@@ -131,25 +198,46 @@ const LandingPage = () => {
               Koleksi pakan dan produk perawatan berkualitas tinggi
             </p>
           </div>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="glass-dark rounded-2xl overflow-hidden card-hover">
-                <div className="h-48 bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center">
-                  <PawPrint className="w-16 h-16 text-primary-400/50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-2 dark:text-white text-gray-900">Pakan Hewan Premium {i}</h3>
-                  <p className="dark:text-gray-400 text-gray-600 text-sm mb-4">Nutrisi berkualitas tinggi untuk hewan peliharaan Anda</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold gradient-text">Rp {(i * 150000).toLocaleString()}</span>
-                    <Link to="/register" className="text-sm text-primary-400 hover:text-primary-300">Lihat</Link>
+            {loading ? (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="glass-dark rounded-2xl overflow-hidden">
+                  <div className="h-48 bg-gradient-to-br from-primary-500/20 to-accent-500/20 animate-pulse"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-white/10 rounded animate-pulse"></div>
+                    <div className="h-3 bg-white/10 rounded animate-pulse"></div>
+                    <div className="h-6 bg-white/10 rounded animate-pulse w-1/2"></div>
                   </div>
                 </div>
+              ))
+            ) : premiumProducts.length > 0 ? (
+              premiumProducts.map((product) => (
+                <div key={product.id} className="glass-dark rounded-2xl overflow-hidden card-hover">
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center">
+                      <PawPrint className="w-16 h-16 text-primary-400/50" />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-2 dark:text-white text-gray-900">{product.name}</h3>
+                    <p className="dark:text-gray-400 text-gray-600 text-sm mb-4">{product.description || 'Produk premium berkualitas'}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold gradient-text">Rp {(product.price || 0).toLocaleString()}</span>
+                      <Link to="/register" className="text-sm text-primary-400 hover:text-primary-300">Lihat</Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-4 text-center dark:text-gray-400 text-gray-600 py-12">
+                Belum ada produk premium
               </div>
-            ))}
+            )}
           </div>
-          
+
           <div className="text-center">
             <Link to="/register" className="btn-primary">
               Lihat Semua Produk <ArrowRight className="inline ml-2 w-5 h-5" />
@@ -180,14 +268,35 @@ const LandingPage = () => {
                 Booking Grooming <ArrowRight className="inline ml-2 w-5 h-5" />
               </Link>
             </div>
-            
+
             <div className="glass rounded-2xl p-8">
               <div className="grid grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-xl flex items-center justify-center">
-                    <Scissors className="w-12 h-12 text-primary-400/50" />
-                  </div>
-                ))}
+                {loading ? (
+                  [1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-square bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-xl animate-pulse"></div>
+                  ))
+                ) : groomingServices.length > 0 ? (
+                  groomingServices.map((service) => (
+                    <div key={service.id} className="aspect-square rounded-xl overflow-hidden relative group">
+                      {service.image_url ? (
+                        <img src={service.image_url} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center">
+                          <Scissors className="w-12 h-12 text-primary-400/50" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <span className="text-white text-sm font-medium line-clamp-1">{service.name}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  [1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-square bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-xl flex items-center justify-center">
+                      <Scissors className="w-12 h-12 text-primary-400/50" />
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

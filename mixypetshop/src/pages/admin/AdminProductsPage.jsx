@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Plus, Edit, Trash2, X, Search, Filter } from 'lucide-react';
-import { productService } from '../../services/supabase';
+import { Package, Plus, Edit, Trash2, X, Search, Filter, Upload, CheckCircle } from 'lucide-react';
+import { productService, storageService } from '../../services/supabase';
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -9,13 +9,16 @@ const AdminProductsPage = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [uploading, setUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     category: 'Kucing',
     price: '',
     stock: '',
     description: '',
-    image: ''
+    image: '',
+    is_premium: false
   });
 
   useEffect(() => {
@@ -46,26 +49,39 @@ const AdminProductsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUploading(true);
     try {
+      let imageUrl = formData.image;
+
+      // Upload new image if file is selected
+      if (imageFile) {
+        imageUrl = await storageService.uploadProductImage(imageFile);
+      }
+
       const productData = {
         ...formData,
+        image: imageUrl,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock)
+        stock: parseInt(formData.stock),
+        is_premium: formData.is_premium
       };
-      
+
       if (editingProduct) {
         await productService.updateProduct(editingProduct.id, productData);
       } else {
         await productService.createProduct(productData);
       }
-      
+
       setShowModal(false);
       setEditingProduct(null);
-      setFormData({ name: '', category: 'Kucing', price: '', stock: '', description: '', image: '' });
+      setImageFile(null);
+      setFormData({ name: '', category: 'Kucing', price: '', stock: '', description: '', image: '', is_premium: false });
       loadProducts();
     } catch (err) {
       console.error('Gagal menyimpan produk:', err);
       alert('Gagal menyimpan produk. Silakan coba lagi.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -77,7 +93,8 @@ const AdminProductsPage = () => {
       price: product.price,
       stock: product.stock,
       description: product.description,
-      image: product.image
+      image: product.image,
+      is_premium: product.is_premium || false
     });
     setShowModal(true);
   };
@@ -97,7 +114,8 @@ const AdminProductsPage = () => {
   const closeModal = () => {
     setShowModal(false);
     setEditingProduct(null);
-    setFormData({ name: '', category: 'Kucing', price: '', stock: '', description: '', image: '' });
+    setImageFile(null);
+    setFormData({ name: '', category: 'Kucing', price: '', stock: '', description: '', image: '', is_premium: false });
   };
 
   if (loading) {
@@ -274,14 +292,53 @@ const AdminProductsPage = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">URL Gambar</label>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  className="input-field"
-                />
+                <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">Gambar Produk</label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                    className="hidden"
+                    id="product-image-upload"
+                  />
+                  <label
+                    htmlFor="product-image-upload"
+                    className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-primary-500 transition-colors"
+                  >
+                    {imageFile ? (
+                      <div className="text-center">
+                        <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-2" />
+                        <p className="dark:text-white text-gray-900 font-medium">{imageFile.name}</p>
+                        <p className="dark:text-gray-400 text-gray-600 text-sm">Klik untuk ganti</p>
+                      </div>
+                    ) : formData.image ? (
+                      <div className="text-center">
+                        <img src={formData.image} alt="Current" className="w-16 h-16 object-cover rounded-lg mx-auto mb-2" />
+                        <p className="dark:text-white text-gray-900 font-medium">Gambar saat ini</p>
+                        <p className="dark:text-gray-400 text-gray-600 text-sm">Klik untuk ganti</p>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="w-10 h-10 dark:text-gray-400 text-gray-600 mx-auto mb-2" />
+                        <p className="dark:text-white text-gray-900 font-medium">Klik untuk upload</p>
+                        <p className="dark:text-gray-400 text-gray-600 text-sm">PNG, JPG hingga 5MB</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_premium"
+                    checked={formData.is_premium}
+                    onChange={(e) => setFormData({ ...formData, is_premium: e.target.checked })}
+                    className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                  />
+                  <span className="text-sm font-medium dark:text-gray-300 text-gray-700">Tampilkan sebagai Produk Premium di halaman utama</span>
+                </label>
               </div>
               
               <div className="flex space-x-4 pt-4">
@@ -294,9 +351,17 @@ const AdminProductsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 btn-primary"
+                  disabled={uploading}
+                  className="flex-1 btn-primary flex items-center justify-center space-x-2"
                 >
-                  {editingProduct ? 'Update' : 'Tambah Produk'}
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Mengunggah...</span>
+                    </>
+                  ) : (
+                    <span>{editingProduct ? 'Update' : 'Tambah Produk'}</span>
+                  )}
                 </button>
               </div>
             </form>

@@ -120,7 +120,12 @@ const PaymentsPage = () => {
               {payment.proof && (
                 <div className="mt-4 p-4 bg-white/5 rounded-xl">
                   <p className="dark:text-gray-400 text-gray-600 text-sm mb-2">Bukti Pembayaran</p>
-                  <img src={payment.proof} alt="Payment proof" className="w-full h-32 object-cover rounded-lg" />
+                  <img
+                    src={payment.proof}
+                    alt="Payment proof"
+                    className="w-full max-h-96 object-contain rounded-lg cursor-pointer hover:opacity-80 transition-opacity bg-black/10"
+                    onClick={() => window.open(payment.proof, '_blank')}
+                  />
                 </div>
               )}
             </div>

@@ -138,7 +138,7 @@ const AdminPaymentsPage = () => {
                   <img
                     src={payment.proof}
                     alt="Payment proof"
-                    className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    className="w-full max-h-96 object-contain rounded-lg cursor-pointer hover:opacity-80 transition-opacity bg-black/10"
                     onClick={() => window.open(payment.proof, '_blank')}
                   />
                 </div>

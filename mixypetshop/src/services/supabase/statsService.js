@@ -65,13 +65,13 @@ export const statsService = {
     // Get total revenue from confirmed/completed reservations
     const { data: reservationRevenueData, error: reservationRevenueError } = await supabase
       .from('reservations')
-      .select('total_price')
+      .select('price')
       .in('status', ['dikonfirmasi', 'selesai']);
 
     if (reservationRevenueError) throw reservationRevenueError;
 
     const paymentRevenue = paymentRevenueData?.reduce((sum, payment) => sum + parseFloat(payment.amount), 0) || 0;
-    const reservationRevenue = reservationRevenueData?.reduce((sum, reservation) => sum + parseFloat(reservation.total_price), 0) || 0;
+    const reservationRevenue = reservationRevenueData?.reduce((sum, reservation) => sum + parseFloat(reservation.price), 0) || 0;
     const totalRevenue = paymentRevenue + reservationRevenue;
     
     // Get recent orders
