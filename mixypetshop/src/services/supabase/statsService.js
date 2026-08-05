@@ -43,9 +43,17 @@ export const statsService = {
     const { count: totalPayments, error: paymentsError } = await supabase
       .from('payments')
       .select('*', { count: 'exact', head: true });
-    
+
     if (paymentsError) throw paymentsError;
-    
+
+    // Get pending payments count
+    const { count: pendingPayments, error: pendingPaymentsError } = await supabase
+      .from('payments')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'menunggu');
+
+    if (pendingPaymentsError) throw pendingPaymentsError;
+
     // Get total revenue (sum of completed orders)
     const { data: revenueData, error: revenueError } = await supabase
       .from('orders')
@@ -74,6 +82,7 @@ export const statsService = {
       totalReservations: totalReservations || 0,
       totalOrders: totalOrders || 0,
       totalPayments: totalPayments || 0,
+      pendingPayments: pendingPayments || 0,
       totalRevenue,
       recentOrders: recentOrders || []
     };

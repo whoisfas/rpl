@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Calendar, CreditCard, Users, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Calendar, CreditCard, Users, Settings, LogOut, Menu, X, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = () => {
@@ -9,12 +9,11 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const menuItems = [
-    { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/admin/products', icon: Package, label: 'Products' },
-    { path: '/admin/reservations', icon: Calendar, label: 'Reservations' },
-    { path: '/admin/orders', icon: Package, label: 'Orders' },
-    { path: '/admin/payments', icon: CreditCard, label: 'Payments' },
-    { path: '/admin/users', icon: Users, label: 'Users' },
+    { path: '/admin', icon: LayoutDashboard, label: 'Overview' },
+    { path: '/admin/create-order', icon: ShoppingCart, label: 'Tambah Order' },
+    { path: '/admin/payments', icon: CreditCard, label: 'Konfirmasi Pembayaran' },
+    { path: '/admin/products', icon: Package, label: 'Produk' },
+    { path: '/admin/reservations', icon: Calendar, label: 'Reservasi' },
   ];
 
   const handleLogout = () => {

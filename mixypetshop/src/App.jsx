@@ -19,9 +19,8 @@ import ProfilePage from './pages/dashboard/ProfilePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminReservationsPage from './pages/admin/AdminReservationsPage';
-import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
-import AdminUsersPage from './pages/admin/AdminUsersPage';
+import CreateOrderPage from './pages/admin/CreateOrderPage';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
@@ -85,11 +84,10 @@ const App = () => {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="create-order" element={<CreateOrderPage />} />
+            <Route path="payments" element={<AdminPaymentsPage />} />
             <Route path="products" element={<AdminProductsPage />} />
             <Route path="reservations" element={<AdminReservationsPage />} />
-            <Route path="orders" element={<AdminOrdersPage />} />
-            <Route path="payments" element={<AdminPaymentsPage />} />
-            <Route path="users" element={<AdminUsersPage />} />
           </Route>
 
           {/* Catch all - redirect to home */}
