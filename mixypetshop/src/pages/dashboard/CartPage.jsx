@@ -71,15 +71,15 @@ const CartPage = () => {
 
       console.log('Order data:', orderData);
 
-      await orderService.createOrder(orderData);
-      console.log('Order created successfully');
+      const order = await orderService.createOrder(orderData);
+      console.log('Order created successfully:', order);
 
       // Clear cart
       setCart([]);
       localStorage.removeItem('cart');
 
-      // Redirect to orders
-      window.location.href = '/dashboard/orders';
+      // Redirect to payment page with order ID
+      window.location.href = `/dashboard/payment/${order.id}`;
     } catch (err) {
       console.error('Failed to create order:', err);
       console.error('Error details:', JSON.stringify(err, null, 2));

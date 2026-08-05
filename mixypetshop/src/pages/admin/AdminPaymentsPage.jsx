@@ -112,25 +112,35 @@ const AdminPaymentsPage = () => {
                     {getStatusIcon(payment.status)}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold dark:text-white text-gray-900">Pembayaran #{payment.id}</h3>
+                    <h3 className="text-lg font-semibold dark:text-white text-gray-900">Pembayaran #{payment.id?.substring(0, 8)}</h3>
                     <p className="dark:text-gray-400 text-gray-600 text-sm">
-                      Pesanan #{payment.orderId} • {new Date(payment.date).toLocaleDateString('id-ID')}
+                      Pesanan #{payment.order_id?.substring(0, 8)} • {payment.created_at ? new Date(payment.created_at).toLocaleDateString('id-ID') : 'N/A'}
                     </p>
+                    {payment.method && (
+                      <p className="dark:text-gray-400 text-gray-600 text-sm">
+                        Metode: {payment.method === 'bca' ? 'Transfer BCA' : 'QRIS'}
+                      </p>
+                    )}
                   </div>
                 </div>
-                
+
                 <div className="text-right">
-                  <p className="text-xl font-bold gradient-text">Rp {payment.amount.toLocaleString()}</p>
+                  <p className="text-xl font-bold gradient-text">Rp {(payment.amount || 0).toLocaleString()}</p>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
                     {payment.status}
                   </span>
                 </div>
               </div>
-              
+
               {payment.proof && (
                 <div className="mt-4 p-4 bg-white/5 rounded-xl">
                   <p className="dark:text-gray-400 text-gray-600 text-sm mb-2">Bukti Pembayaran</p>
-                  <img src={payment.proof} alt="Payment proof" className="w-full h-32 object-cover rounded-lg" />
+                  <img
+                    src={payment.proof}
+                    alt="Payment proof"
+                    className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => window.open(payment.proof, '_blank')}
+                  />
                 </div>
               )}
               

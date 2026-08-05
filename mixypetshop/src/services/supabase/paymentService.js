@@ -69,12 +69,22 @@ export const paymentService = {
    * @returns {Promise} - Created payment data
    */
   async createPayment(paymentData) {
+    // Transform camelCase to snake_case for database
+    const dbData = {
+      order_id: paymentData.order_id,
+      user_id: paymentData.user_id,
+      amount: paymentData.amount,
+      method: paymentData.method || 'bca',
+      proof: paymentData.proof,
+      status: paymentData.status || 'menunggu'
+    };
+
     const { data, error } = await supabase
       .from('payments')
-      .insert(paymentData)
+      .insert(dbData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },

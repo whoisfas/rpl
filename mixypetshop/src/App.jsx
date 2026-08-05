@@ -14,6 +14,7 @@ import CartPage from './pages/dashboard/CartPage';
 import ReservationsPage from './pages/dashboard/ReservationsPage';
 import OrdersPage from './pages/dashboard/OrdersPage';
 import PaymentsPage from './pages/dashboard/PaymentsPage';
+import PaymentDetailPage from './pages/dashboard/PaymentDetailPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
@@ -70,6 +71,7 @@ const App = () => {
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="payments" element={<PaymentsPage />} />
+            <Route path="payment/:orderId" element={<PaymentDetailPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 
