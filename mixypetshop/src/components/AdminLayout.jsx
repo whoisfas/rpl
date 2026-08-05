@@ -9,8 +9,8 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const menuItems = [
-    { path: '/admin', icon: LayoutDashboard, label: 'Overview' },
-    { path: '/admin/create-order', icon: ShoppingCart, label: 'Tambah Order' },
+    { path: '/admin', icon: LayoutDashboard, label: 'Ringkasan' },
+    { path: '/admin/create-order', icon: ShoppingCart, label: 'Tambah Pesanan' },
     { path: '/admin/payments', icon: CreditCard, label: 'Konfirmasi Pembayaran' },
     { path: '/admin/news', icon: Newspaper, label: 'Berita' },
     { path: '/admin/grooming', icon: Scissors, label: 'Grooming' },
