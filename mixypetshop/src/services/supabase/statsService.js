@@ -54,15 +54,25 @@ export const statsService = {
 
     if (pendingPaymentsError) throw pendingPaymentsError;
 
-    // Get total revenue (sum of completed orders)
-    const { data: revenueData, error: revenueError } = await supabase
-      .from('orders')
-      .select('total')
-      .eq('status', 'selesai');
-    
-    if (revenueError) throw revenueError;
-    
-    const totalRevenue = revenueData?.reduce((sum, order) => sum + parseFloat(order.total), 0) || 0;
+    // Get total revenue from verified payments
+    const { data: paymentRevenueData, error: paymentRevenueError } = await supabase
+      .from('payments')
+      .select('amount')
+      .eq('status', 'terverifikasi');
+
+    if (paymentRevenueError) throw paymentRevenueError;
+
+    // Get total revenue from confirmed/completed reservations
+    const { data: reservationRevenueData, error: reservationRevenueError } = await supabase
+      .from('reservations')
+      .select('total_price')
+      .in('status', ['dikonfirmasi', 'selesai']);
+
+    if (reservationRevenueError) throw reservationRevenueError;
+
+    const paymentRevenue = paymentRevenueData?.reduce((sum, payment) => sum + parseFloat(payment.amount), 0) || 0;
+    const reservationRevenue = reservationRevenueData?.reduce((sum, reservation) => sum + parseFloat(reservation.total_price), 0) || 0;
+    const totalRevenue = paymentRevenue + reservationRevenue;
     
     // Get recent orders
     const { data: recentOrders, error: recentOrdersError } = await supabase
