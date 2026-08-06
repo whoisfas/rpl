@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CreditCard, Upload, ArrowLeft, CheckCircle, Clock } from 'lucide-react';
 import { orderService, paymentService, storageService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const PaymentDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { success, error, warning } = useToast();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -29,7 +31,7 @@ const PaymentDetailPage = () => {
       setOrder(data);
     } catch (err) {
       console.error('Gagal memuat pesanan:', err);
-      alert('Gagal memuat pesanan');
+      error('Gagal memuat pesanan');
       navigate('/dashboard/orders');
     } finally {
       setLoading(false);
@@ -58,7 +60,7 @@ const PaymentDetailPage = () => {
   const handleSubmitPayment = async (e) => {
     e.preventDefault();
     if (!proofFile) {
-      alert('Silakan pilih bukti pembayaran');
+      warning('Silakan pilih bukti pembayaran');
       return;
     }
 
@@ -77,11 +79,11 @@ const PaymentDetailPage = () => {
         status: 'menunggu'
       });
 
-      alert('Bukti pembayaran berhasil diunggah. Menunggu konfirmasi admin.');
+      success('Bukti pembayaran berhasil diunggah. Menunggu konfirmasi admin.');
       navigate('/dashboard/payments');
     } catch (err) {
       console.error('Gagal mengunggah pembayaran:', err);
-      alert(`Gagal mengunggah pembayaran: ${err.message || err}`);
+      error(`Gagal mengunggah pembayaran: ${err.message || err}`);
     } finally {
       setUploading(false);
     }

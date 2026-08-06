@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Edit, Save, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { userService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
+  const { success, error } = useToast();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,10 +36,11 @@ const ProfilePage = () => {
     try {
       const updatedUser = await userService.updateUser(user.id, formData);
       updateUser(updatedUser);
+      success('Profil berhasil diperbarui');
       setEditing(false);
     } catch (err) {
       console.error('Gagal memperbarui profil:', err);
-      alert('Gagal memperbarui profil. Silakan coba lagi.');
+      error('Gagal memperbarui profil. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }

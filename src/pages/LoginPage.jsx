@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PawPrint, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const LoginPage = () => {
+  const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,12 +25,16 @@ const LoginPage = () => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
+        success('Login berhasil!');
         navigate('/dashboard');
       } else {
         setError(result.error);
+        toastError(result.error);
       }
     } catch (err) {
-      setError('Login gagal. Silakan coba lagi.');
+      const errorMsg = 'Login gagal. Silakan coba lagi.';
+      setError(errorMsg);
+      toastError(errorMsg);
     } finally {
       setLoading(false);
     }

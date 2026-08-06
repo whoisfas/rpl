@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Edit, Trash2, X, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { paymentService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminPaymentsPage = () => {
+  const { success, error } = useToast();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -34,13 +36,14 @@ const AdminPaymentsPage = () => {
     e.preventDefault();
     try {
       await paymentService.updatePaymentStatus(editingPayment.id, formData.status);
+      success('Status pembayaran berhasil diperbarui');
       setShowModal(false);
       setEditingPayment(null);
       setFormData({ status: 'menunggu' });
       loadPayments();
     } catch (err) {
       console.error('Gagal memperbarui pembayaran:', err);
-      alert('Gagal memperbarui pembayaran. Silakan coba lagi.');
+      error('Gagal memperbarui pembayaran. Silakan coba lagi.');
     }
   };
 
@@ -55,10 +58,11 @@ const AdminPaymentsPage = () => {
     
     try {
       await paymentService.deletePayment(id);
+      success('Pembayaran berhasil dihapus');
       loadPayments();
     } catch (err) {
       console.error('Gagal menghapus pembayaran:', err);
-      alert('Gagal menghapus pembayaran. Silakan coba lagi.');
+      error('Gagal menghapus pembayaran. Silakan coba lagi.');
     }
   };
 

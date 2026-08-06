@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Plus, Edit, Trash2, X, Search, Filter, Upload, CheckCircle } from 'lucide-react';
 import { productService, storageService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminProductsPage = () => {
+  const { success, error } = useToast();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -68,8 +70,10 @@ const AdminProductsPage = () => {
 
       if (editingProduct) {
         await productService.updateProduct(editingProduct.id, productData);
+        success('Produk berhasil diperbarui');
       } else {
         await productService.createProduct(productData);
+        success('Produk berhasil ditambahkan');
       }
 
       setShowModal(false);
@@ -79,7 +83,7 @@ const AdminProductsPage = () => {
       loadProducts();
     } catch (err) {
       console.error('Gagal menyimpan produk:', err);
-      alert('Gagal menyimpan produk. Silakan coba lagi.');
+      error('Gagal menyimpan produk. Silakan coba lagi.');
     } finally {
       setUploading(false);
     }
@@ -104,10 +108,11 @@ const AdminProductsPage = () => {
     
     try {
       await productService.deleteProduct(id);
+      success('Produk berhasil dihapus');
       loadProducts();
     } catch (err) {
       console.error('Gagal menghapus produk:', err);
-      alert('Gagal menghapus produk. Silakan coba lagi.');
+      error('Gagal menghapus produk. Silakan coba lagi.');
     }
   };
 

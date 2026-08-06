@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Scissors, Edit, Trash2, Plus, X, Upload, CheckCircle } from 'lucide-react';
 import { groomingService, storageService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminGroomingPage = () => {
+  const { success, error } = useToast();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -55,8 +57,10 @@ const AdminGroomingPage = () => {
 
       if (editingService) {
         await groomingService.updateGroomingService(editingService.id, serviceData);
+        success('Layanan grooming berhasil diperbarui');
       } else {
         await groomingService.createGroomingService(serviceData);
+        success('Layanan grooming berhasil ditambahkan');
       }
 
       setShowModal(false);
@@ -66,7 +70,7 @@ const AdminGroomingPage = () => {
       loadServices();
     } catch (err) {
       console.error('Gagal menyimpan layanan grooming:', err);
-      alert('Gagal menyimpan layanan grooming. Silakan coba lagi.');
+      error('Gagal menyimpan layanan grooming. Silakan coba lagi.');
     } finally {
       setUploading(false);
     }
@@ -89,10 +93,11 @@ const AdminGroomingPage = () => {
 
     try {
       await groomingService.deleteGroomingService(id);
+      success('Layanan grooming berhasil dihapus');
       loadServices();
     } catch (err) {
       console.error('Gagal menghapus layanan:', err);
-      alert('Gagal menghapus layanan. Silakan coba lagi.');
+      error('Gagal menghapus layanan. Silakan coba lagi.');
     }
   };
 

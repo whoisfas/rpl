@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { productService, orderService, userService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const CreateOrderPage = () => {
   const navigate = useNavigate();
+  const { success, error, warning } = useToast();
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
@@ -59,7 +61,7 @@ const CreateOrderPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedUser || orderItems.length === 0) {
-      alert('Pilih user dan tambahkan minimal 1 produk');
+      warning('Pilih user dan tambahkan minimal 1 produk');
       return;
     }
 
@@ -73,11 +75,11 @@ const CreateOrderPage = () => {
       };
 
       await orderService.createOrder(orderData);
-      alert('Order berhasil dibuat');
+      success('Order berhasil dibuat');
       navigate('/admin');
     } catch (err) {
       console.error('Gagal membuat order:', err);
-      alert(`Gagal membuat order: ${err.message || err}`);
+      error(`Gagal membuat order: ${err.message || err}`);
     } finally {
       setLoading(false);
     }

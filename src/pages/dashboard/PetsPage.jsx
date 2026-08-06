@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { PawPrint, Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import { petService, storageService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const PetsPage = () => {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -54,7 +56,7 @@ const PetsPage = () => {
           console.log('Image uploaded successfully:', imageUrl);
         } catch (uploadError) {
           console.error('Image upload failed:', uploadError);
-          alert(`Gagal upload gambar: ${uploadError.message || uploadError}`);
+          error(`Gagal upload gambar: ${uploadError.message || uploadError}`);
           throw uploadError;
         }
       }
@@ -74,8 +76,10 @@ const PetsPage = () => {
 
       if (editingPet) {
         await petService.updatePet(editingPet.id, petData);
+        success('Hewan berhasil diperbarui');
       } else {
         await petService.createPet(petData);
+        success('Hewan berhasilTambahkan');
       }
       setShowModal(false);
       setEditingPet(null);
@@ -85,7 +89,7 @@ const PetsPage = () => {
     } catch (err) {
       console.error('Gagal menyimpan hewan:', err);
       console.error('Error details:', JSON.stringify(err, null, 2));
-      alert(`Gagal menyimpan hewan: ${err.message || err}`);
+      error(`Gagal menyimpan hewan: ${err.message || err}`);
     } finally {
       setUploading(false);
     }
@@ -109,10 +113,11 @@ const PetsPage = () => {
     
     try {
       await petService.deletePet(id);
+      success('Hewan berhasil dihapus');
       loadPets();
     } catch (err) {
       console.error('Gagal menghapus hewan:', err);
-      alert('Gagal menghapus hewan. Silakan coba lagi.');
+      error('Gagal menghapus hewan. Silakan coba lagi.');
     }
   };
 

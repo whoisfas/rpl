@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider, useToast } from './context/ToastContext';
+import Toast from './components/Toast';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -46,59 +48,80 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
+const ToastContainer = () => {
+  const { toasts, removeToast } = useToast();
+
+  return (
+    <>
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => removeToast(toast.id)}
+          duration={toast.duration}
+        />
+      ))}
+    </>
+  );
+};
+
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+    <ToastProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* Customer Dashboard Routes */}
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<DashboardOverview />} />
-            <Route path="pets" element={<PetsPage />} />
-            <Route path="products" element={<ProductsPage />} />
-            <Route path="cart" element={<CartPage />} />
-            <Route path="reservations" element={<ReservationsPage />} />
-            <Route path="orders" element={<OrdersPage />} />
-            <Route path="payments" element={<PaymentsPage />} />
-            <Route path="payment/:orderId" element={<PaymentDetailPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-          </Route>
+            {/* Customer Dashboard Routes */}
+            <Route
+              path="/dashboard/*"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardOverview />} />
+              <Route path="pets" element={<PetsPage />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="cart" element={<CartPage />} />
+              <Route path="reservations" element={<ReservationsPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="payment/:orderId" element={<PaymentDetailPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
 
-          {/* Admin Dashboard Routes */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute adminOnly>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="create-order" element={<CreateOrderPage />} />
-            <Route path="payments" element={<AdminPaymentsPage />} />
-            <Route path="news" element={<AdminNewsPage />} />
-            <Route path="grooming" element={<AdminGroomingPage />} />
-            <Route path="products" element={<AdminProductsPage />} />
-            <Route path="reservations" element={<AdminReservationsPage />} />
-          </Route>
+            {/* Admin Dashboard Routes */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="create-order" element={<CreateOrderPage />} />
+              <Route path="payments" element={<AdminPaymentsPage />} />
+              <Route path="news" element={<AdminNewsPage />} />
+              <Route path="grooming" element={<AdminGroomingPage />} />
+              <Route path="products" element={<AdminProductsPage />} />
+              <Route path="reservations" element={<AdminReservationsPage />} />
+            </Route>
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            {/* Catch all - redirect to home */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+          <ToastContainer />
+        </Router>
+      </AuthProvider>
+    </ToastProvider>
   );
 };
 

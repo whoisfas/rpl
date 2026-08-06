@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Newspaper, Edit, Trash2, Plus, X, Upload, CheckCircle } from 'lucide-react';
 import { newsService, storageService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminNewsPage = () => {
+  const { success, error } = useToast();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -52,8 +54,10 @@ const AdminNewsPage = () => {
 
       if (editingNews) {
         await newsService.updateNews(editingNews.id, newsData);
+        success('Berita berhasil diperbarui');
       } else {
         await newsService.createNews(newsData);
+        success('Berita berhasil ditambahkan');
       }
 
       setShowModal(false);
@@ -63,7 +67,7 @@ const AdminNewsPage = () => {
       loadNews();
     } catch (err) {
       console.error('Gagal menyimpan berita:', err);
-      alert('Gagal menyimpan berita. Silakan coba lagi.');
+      error('Gagal menyimpan berita. Silakan coba lagi.');
     } finally {
       setUploading(false);
     }
@@ -84,10 +88,11 @@ const AdminNewsPage = () => {
     
     try {
       await newsService.deleteNews(id);
+      success('Berita berhasil dihapus');
       loadNews();
     } catch (err) {
       console.error('Gagal menghapus berita:', err);
-      alert('Gagal menghapus berita. Silakan coba lagi.');
+      error('Gagal menghapus berita. Silakan coba lagi.');
     }
   };
 

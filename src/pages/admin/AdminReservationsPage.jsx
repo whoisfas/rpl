@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Edit, Trash2, X, Scissors, Home } from 'lucide-react';
 import { reservationService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminReservationsPage = () => {
+  const { success, error } = useToast();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -34,13 +36,14 @@ const AdminReservationsPage = () => {
     e.preventDefault();
     try {
       await reservationService.updateReservationStatus(editingReservation.id, formData.status);
+      success('Status reservasi berhasil diperbarui');
       setShowModal(false);
       setEditingReservation(null);
       setFormData({ status: 'menunggu' });
       loadReservations();
     } catch (err) {
       console.error('Gagal memperbarui reservasi:', err);
-      alert('Gagal memperbarui reservasi. Silakan coba lagi.');
+      error('Gagal memperbarui reservasi. Silakan coba lagi.');
     }
   };
 
@@ -55,10 +58,11 @@ const AdminReservationsPage = () => {
     
     try {
       await reservationService.deleteReservation(id);
+      success('Reservasi berhasil dihapus');
       loadReservations();
     } catch (err) {
       console.error('Gagal menghapus reservasi:', err);
-      alert('Gagal menghapus reservasi. Silakan coba lagi.');
+      error('Gagal menghapus reservasi. Silakan coba lagi.');
     }
   };
 

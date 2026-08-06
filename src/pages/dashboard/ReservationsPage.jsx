@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Plus, Scissors, Home, X, Edit, Trash2 } from 'lucide-react';
 import { reservationService, petService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const ReservationsPage = () => {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const [reservations, setReservations] = useState([]);
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,8 +59,10 @@ const ReservationsPage = () => {
 
       if (editingReservation) {
         await reservationService.updateReservation(editingReservation.id, reservationData);
+        success('Reservasi berhasil diperbarui');
       } else {
         await reservationService.createReservation(reservationData);
+        success('Reservasi berhasil dibuat');
       }
 
       setShowModal(false);
@@ -67,7 +71,7 @@ const ReservationsPage = () => {
       loadData();
     } catch (err) {
       console.error('Gagal menyimpan reservasi:', err);
-      alert(`Gagal menyimpan reservasi: ${err.message || err}`);
+      error(`Gagal menyimpan reservasi: ${err.message || err}`);
     }
   };
 
@@ -87,10 +91,11 @@ const ReservationsPage = () => {
     
     try {
       await reservationService.deleteReservation(id);
+      success('Reservasi berhasil dibatalkan');
       loadData();
     } catch (err) {
       console.error('Gagal menghapus reservasi:', err);
-      alert('Gagal menghapus reservasi. Silakan coba lagi.');
+      error('Gagal menghapus reservasi. Silakan coba lagi.');
     }
   };
 

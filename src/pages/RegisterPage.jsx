@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PawPrint, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const RegisterPage = () => {
+  const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,12 +31,16 @@ const RegisterPage = () => {
     try {
       const result = await register(formData.email, formData.password, formData.name);
       if (result.success) {
+        success('Registrasi berhasil! Silakan login.');
         navigate('/login');
       } else {
         setError(result.error);
+        toastError(result.error);
       }
     } catch (err) {
-      setError('Registrasi gagal. Silakan coba lagi.');
+      const errorMsg = 'Registrasi gagal. Silakan coba lagi.';
+      setError(errorMsg);
+      toastError(errorMsg);
     } finally {
       setLoading(false);
     }

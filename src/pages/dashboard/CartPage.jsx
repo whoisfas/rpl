@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, Plus, Minus, Trash2, CreditCard } from 'lucide-react';
 import { orderService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const CartPage = () => {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -83,7 +85,7 @@ const CartPage = () => {
     } catch (err) {
       console.error('Failed to create order:', err);
       console.error('Error details:', JSON.stringify(err, null, 2));
-      alert(`Gagal membuat pesanan: ${err.message || err}`);
+      error(`Gagal membuat pesanan: ${err.message || err}`);
     } finally {
       setLoading(false);
     }
