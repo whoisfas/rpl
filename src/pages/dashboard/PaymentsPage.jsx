@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, Upload, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { paymentService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const PaymentsPage = () => {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -40,10 +42,11 @@ const PaymentsPage = () => {
       setShowUploadModal(false);
       setSelectedOrder(null);
       setProofUrl('');
+      success('Bukti pembayaran berhasil diunggah');
       loadPayments();
     } catch (err) {
       console.error('Gagal mengunggah pembayaran:', err);
-      alert('Gagal mengunggah pembayaran. Silakan coba lagi.');
+      error('Gagal mengunggah pembayaran. Silakan coba lagi.');
     }
   };
 

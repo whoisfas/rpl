@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import { productService, storageService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const ProductsPage = () => {
   const { user, isAdmin } = useAuth();
+  const { success, error } = useToast();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +127,7 @@ const ProductsPage = () => {
           console.log('Product image uploaded successfully:', imageUrl);
         } catch (uploadError) {
           console.error('Product image upload failed:', uploadError);
-          alert(`Gagal upload gambar produk: ${uploadError.message || uploadError}`);
+          error(`Gagal upload gambar produk: ${uploadError.message || uploadError}`);
           throw uploadError;
         }
       }
@@ -143,8 +145,10 @@ const ProductsPage = () => {
 
       if (editingProduct) {
         await productService.updateProduct(editingProduct.id, productData);
+        success('Produk berhasil diperbarui');
       } else {
         await productService.createProduct(productData);
+        success('Produk berhasil ditambahkan');
       }
 
       setShowAdminModal(false);
@@ -155,7 +159,7 @@ const ProductsPage = () => {
     } catch (err) {
       console.error('Gagal menyimpan produk:', err);
       console.error('Error details:', JSON.stringify(err, null, 2));
-      alert(`Gagal menyimpan produk: ${err.message || err}`);
+      error(`Gagal menyimpan produk: ${err.message || err}`);
     } finally {
       setUploading(false);
     }
@@ -180,10 +184,11 @@ const ProductsPage = () => {
     
     try {
       await productService.deleteProduct(id);
+      success('Produk berhasil dihapus');
       loadProducts();
     } catch (err) {
       console.error('Gagal menghapus produk:', err);
-      alert('Gagal menghapus produk. Silakan coba lagi.');
+      error('Gagal menghapus produk. Silakan coba lagi.');
     }
   };
 
@@ -197,6 +202,15 @@ const ProductsPage = () => {
 
   return (
     <div className="space-y-6">
+      {filteredProducts.length === 0 && (
+        <div className="glass-dark rounded-2xl p-12 text-center">
+          <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">📦</span>
+          </div>
+          <h3 className="text-xl font-semibold dark:text-white text-gray-900 mb-2">Tidak ada produk</h3>
+          <p className="dark:text-gray-400 text-gray-600">Produk akan muncul di sini</p>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold gradient-text">Produk</h1>
         
