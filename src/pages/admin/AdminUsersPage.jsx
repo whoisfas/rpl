@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Edit, Trash2, X, Search } from 'lucide-react';
 import { userService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminUsersPage = () => {
+  const { success, error, warning } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -46,8 +48,9 @@ const AdminUsersPage = () => {
     try {
       if (editingUser) {
         await userService.updateUser(editingUser.id, formData);
+        success('Pengguna berhasil diperbarui');
       } else {
-        alert('Tidak dapat membuat pengguna baru melalui panel admin. Pengguna harus mendaftar.');
+        warning('Tidak dapat membuat pengguna baru melalui panel admin. Pengguna harus mendaftar.');
       }
       setShowModal(false);
       setEditingUser(null);
@@ -55,7 +58,7 @@ const AdminUsersPage = () => {
       loadUsers();
     } catch (err) {
       console.error('Gagal memperbarui pengguna:', err);
-      alert('Gagal memperbarui pengguna. Silakan coba lagi.');
+      error('Gagal memperbarui pengguna. Silakan coba lagi.');
     }
   };
 
@@ -76,10 +79,11 @@ const AdminUsersPage = () => {
     
     try {
       await userService.deleteUser(id);
+      success('Pengguna berhasil dihapus');
       loadUsers();
     } catch (err) {
       console.error('Failed to delete user:', err);
-      alert('Gagal menghapus pengguna. Silakan coba lagi.');
+      error('Gagal menghapus pengguna. Silakan coba lagi.');
     }
   };
 

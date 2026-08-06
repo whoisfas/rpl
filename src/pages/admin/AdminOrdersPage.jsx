@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Edit, Trash2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { orderService } from '../../services/supabase';
+import { useToast } from '../../context/ToastContext';
 
 const AdminOrdersPage = () => {
+  const { success, error } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -35,13 +37,14 @@ const AdminOrdersPage = () => {
     e.preventDefault();
     try {
       await orderService.updateOrderStatus(editingOrder.id, formData.status);
+      success('Status pesanan berhasil diperbarui');
       setShowModal(false);
       setEditingOrder(null);
       setFormData({ status: 'menunggu' });
       loadOrders();
     } catch (err) {
       console.error('Gagal memperbarui pesanan:', err);
-      alert('Gagal memperbarui pesanan. Silakan coba lagi.');
+      error('Gagal memperbarui pesanan. Silakan coba lagi.');
     }
   };
 
@@ -56,10 +59,11 @@ const AdminOrdersPage = () => {
     
     try {
       await orderService.deleteOrder(id);
+      success('Pesanan berhasil dihapus');
       loadOrders();
     } catch (err) {
       console.error('Gagal menghapus pesanan:', err);
-      alert('Gagal menghapus pesanan. Silakan coba lagi.');
+      error('Gagal menghapus pesanan. Silakan coba lagi.');
     }
   };
 
