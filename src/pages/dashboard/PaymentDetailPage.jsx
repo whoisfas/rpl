@@ -66,10 +66,18 @@ const PaymentDetailPage = () => {
 
     setUploading(true);
     try {
+      console.log('Starting payment upload...');
+      console.log('Order ID:', orderId);
+      console.log('User ID:', user.id);
+      console.log('File:', proofFile.name);
+
       // Upload bukti pembayaran ke Supabase Storage
+      console.log('Uploading payment proof to storage...');
       const proofUrl = await storageService.uploadPaymentProof(proofFile);
+      console.log('Payment proof uploaded successfully:', proofUrl);
 
       // Create payment record
+      console.log('Creating payment record...');
       await paymentService.createPayment({
         order_id: orderId,
         user_id: user.id,
@@ -78,11 +86,13 @@ const PaymentDetailPage = () => {
         proof: proofUrl,
         status: 'menunggu'
       });
+      console.log('Payment record created successfully');
 
       success('Bukti pembayaran berhasil diunggah. Menunggu konfirmasi admin.');
       navigate('/dashboard/payments');
     } catch (err) {
       console.error('Gagal mengunggah pembayaran:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
       error(`Gagal mengunggah pembayaran: ${err.message || err}`);
     } finally {
       setUploading(false);
