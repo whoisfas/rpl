@@ -9,6 +9,7 @@ const PaymentsPage = () => {
   const { success, error } = useToast();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [proofUrl, setProofUrl] = useState('');
@@ -20,10 +21,15 @@ const PaymentsPage = () => {
   const loadPayments = async () => {
     if (!user) return;
     try {
+      console.log('Loading payments for user:', user.id);
       const data = await paymentService.getUserPayments(user.id);
+      console.log('Payments loaded:', data);
       setPayments(data);
+      setError(null);
     } catch (err) {
       console.error('Gagal memuat pembayaran:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
+      setError(err.message || 'Gagal memuat pembayaran');
     } finally {
       setLoading(false);
     }
@@ -76,6 +82,21 @@ const PaymentsPage = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="glass-dark rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-red-400 mb-2">Error</h2>
+        <p className="dark:text-gray-400 text-gray-600">{error}</p>
+        <button
+          onClick={loadPayments}
+          className="mt-4 px-4 py-2 bg-primary-500/20 hover:bg-primary-500/30 text-primary-400 rounded-xl transition-colors"
+        >
+          Coba Lagi
+        </button>
       </div>
     );
   }
