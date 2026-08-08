@@ -177,10 +177,22 @@ const AdminProductsPage = () => {
           <div key={product.id} className="glass-dark rounded-2xl overflow-hidden card-hover">
             <div className="h-48 bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center relative">
               {product.image ? (
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-              ) : (
-                <Package className="w-16 h-16 text-primary-400/50" />
-              )}
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover img-loading"
+                  loading="lazy"
+                  onLoad={(e) => {
+                    e.target.classList.remove('img-loading');
+                    e.target.classList.add('img-loaded');
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+              ) : null}
+              <Package className="w-16 h-16 text-primary-400/50" style={{ display: product.image ? 'none' : 'block' }} />
               <div className="absolute top-4 right-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   product.stock > 0

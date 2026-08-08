@@ -13,6 +13,55 @@ const BUCKETS = {
 
 export const storageService = {
   /**
+   * Compress image before upload
+   * @param {File} file - File to compress
+   * @param {number} maxWidth - Maximum width
+   * @param {number} quality - Image quality (0-1)
+   * @returns {Promise} - Compressed file
+   */
+  async compressImage(file, maxWidth = 800, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to blob
+          canvas.toBlob(
+            (blob) => {
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        img.onerror = (error) => reject(error);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  },
+
+  /**
    * Upload image to storage
    * @param {File} file - File to upload
    * @param {string} bucket - Bucket name
@@ -21,26 +70,31 @@ export const storageService = {
    */
   async uploadImage(file, bucket = BUCKETS.PRODUCTS, folder = '') {
     try {
+      // Compress image before upload
+      const compressedFile = await this.compressImage(file);
+      console.log('Original size:', file.size, 'Compressed size:', compressedFile.size);
+
       // Generate unique filename
-      const fileExt = file.name.split('.').pop();
+      const fileExt = 'jpg';
       const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = folder ? `${folder}/${fileName}` : fileName;
-      
+
       // Upload file
       const { data, error } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file, {
+        .upload(filePath, compressedFile, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          contentType: 'image/jpeg'
         });
-      
+
       if (error) throw error;
-      
+
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
         .getPublicUrl(data.path);
-      
+
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
