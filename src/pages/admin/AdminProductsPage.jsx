@@ -30,6 +30,8 @@ const AdminProductsPage = () => {
   const loadProducts = async () => {
     try {
       const data = await productService.getAllProducts();
+      console.log('Products loaded:', data);
+      console.log('Product images:', data.map(p => p.image));
       setProducts(data);
     } catch (err) {
       console.error('Gagal memuat produk:', err);
