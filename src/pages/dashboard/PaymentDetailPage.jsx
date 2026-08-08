@@ -10,6 +10,9 @@ const PaymentDetailPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { success, error, warning } = useToast();
+
+  console.log('PaymentDetailPage mounted');
+  console.log('OrderId from params:', orderId);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
