@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PawPrint, Package, Calendar, ShoppingCart, TrendingUp, Users } from 'lucide-react';
-import api from '../../services/api';
+import { petService, orderService, reservationService, paymentService } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
 
 const DashboardOverview = () => {
@@ -20,18 +20,18 @@ const DashboardOverview = () => {
 
   const loadStats = async () => {
     try {
-      const [petsRes, ordersRes, reservationsRes, paymentsRes] = await Promise.all([
-        api.get(`/pets?userId=${user.id}`),
-        api.get(`/orders?userId=${user.id}`),
-        api.get(`/reservations?userId=${user.id}`),
-        api.get(`/payments?userId=${user.id}`)
+      const [petsData, ordersData, reservationsData, paymentsData] = await Promise.all([
+        petService.getUserPets(user.id),
+        orderService.getUserOrders(user.id),
+        reservationService.getUserReservations(user.id),
+        paymentService.getUserPayments(user.id)
       ]);
-      
+
       setStats({
-        pets: petsRes.data.length,
-        orders: ordersRes.data.length,
-        reservations: reservationsRes.data.length,
-        payments: paymentsRes.data.length
+        pets: petsData?.length || 0,
+        orders: ordersData?.length || 0,
+        reservations: reservationsData?.length || 0,
+        payments: paymentsData?.length || 0
       });
     } catch (err) {
       console.error('Failed to load stats:', err);
